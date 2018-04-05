@@ -2,30 +2,30 @@ package assignment5;
 
 
 import java.util.List;
-
-import javafx.application.*;
-
 import javafx.stage.Stage;
-
 import javafx.application.Application;
-import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.ArcType;
-
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.layout.*;
-
-import javafx.scene.text.*;
-
 import javafx.scene.control.*;
 
 
+/* CRITTERS Main.java
+ * EE422C Project 5 submission by
+ * Replace <...> with your actual data.
+ * Daniel Canterino
+ * djc3323
+ * 15460
+ * Spring 2018
+ */
 
+/**
+ * @author Daniel Canterino
+ * @version 1.0
+ * This class is the main for critter to run. It runs as an application with GUI.
+ */
 public class Main extends Application{
 	
 	private static String myPackage;	// package of Critter file.  Critter cannot be in default pkg.
@@ -59,7 +59,6 @@ public class Main extends Application{
 	        final TextField critterName = new TextField();
 	        critterName.setPromptText("Critter Type");
 	        critterName.setPrefColumnCount(10);
-	        critterName.getText();
 	        GridPane.setConstraints(critterName, 0, 0);
 	        grid.getChildren().add(critterName);
 	        //Defining the critter number text field
@@ -110,10 +109,13 @@ public class Main extends Application{
 
 	        //making field to fill out
 	        final Label label = new Label();
-	        GridPane.setConstraints(label, 0, 6);
+	        GridPane.setConstraints(label, 3, 0);
 	        GridPane.setColumnSpan(label, 2);
 	        grid.getChildren().add(label);
-
+	        
+	        /*
+	         * action handler for the make button
+	         */
 	        submit.setOnAction(new EventHandler<ActionEvent>() {
 
 	        	@Override
@@ -142,7 +144,9 @@ public class Main extends Application{
 	        			}
 	    			}
 	        	 });
-	        
+	        /*
+	         * action handler for the step button
+	         */
 	        step.setOnAction(new EventHandler<ActionEvent>() {
 	        	
 	        	@Override
@@ -162,6 +166,9 @@ public class Main extends Application{
     			}
         	 });
 	        
+	        /*
+	         * action handler for the quit button
+	         */
 	        quit.setOnAction(new EventHandler<ActionEvent>() {
 	        	
 	        	@Override
@@ -170,6 +177,9 @@ public class Main extends Application{
     			}
         	 });
 	        
+	        /*
+	         * action handler for the stats button
+	         */
 	        stats.setOnAction(new EventHandler<ActionEvent>() {
 	        	
 	        	@Override
@@ -202,6 +212,9 @@ public class Main extends Application{
 	        	}
         	 });
 	        
+	        /*
+	         * action handler for the seed button
+	         */
 	        seed.setOnAction(new EventHandler<ActionEvent>() {
 	        	
 	        	@Override
@@ -214,13 +227,14 @@ public class Main extends Application{
 	        			}
     			}
         	 });
-	        
-
-	        
-	        primaryStage.setScene(new Scene(grid, 1000, 1000));
+	        primaryStage.setScene(new Scene(grid, 1000, 1000));//displays grid on a 1000x1000 page
 	        primaryStage.show();
 	    }
-	    
+		/**
+		 * Checks to see if a passed string is a number
+		 * @param number, the string to be checked
+		 * @return true if all characters in the string are valid ascii integers
+		 */
 	    public boolean isNumber(String number) {
 	    	for (int i = 0; i < number.length(); i++) {
 				if (number.charAt(i) < '0' || number.charAt(i) > '9') {

@@ -1,31 +1,27 @@
 package assignment5;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javafx.application.*;
-
-import javafx.stage.Stage;
-
-import javafx.application.Application;
-import javafx.scene.Group;
-import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.ArcType;
-
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.scene.layout.*;
 
-import javafx.scene.text.*;
+/* CRITTERS Critter.java
+ * EE422C Project 5 submission by
+ * Replace <...> with your actual data.
+ * Daniel Canterino
+ * djc3323
+ * 15460
+ * Spring 2018
+ */
 
-import javafx.scene.control.*;
-
+/**
+ * @author Daniel Canterino
+ * @version 1.0
+ * This is the Critter class. It provides many methods for the critter subclasses.
+ */
 
 
 public abstract class Critter {
@@ -50,7 +46,7 @@ public abstract class Critter {
 	 * need to, but please preserve that intent as you implement them. 
 	 */
 	public javafx.scene.paint.Color viewColor() { 
-		return javafx.scene.paint.Color.WHITE; 
+		return javafx.scene.paint.Color.DARKGREY; 
 	}
 	
 	public javafx.scene.paint.Color viewOutlineColor() { return viewColor(); }
@@ -64,14 +60,20 @@ public abstract class Critter {
 	
 	private static int timestep = 0;
 	private static List<Critter> alreadyMoved = new java.util.ArrayList<Critter>();
-	private static int critterSize = 3;
-	private static Map<Critter, ArrayList<Integer>> oldLocation = new HashMap<Critter, ArrayList<Integer>>();//x, y in arrayList (0, 1)
+	private static int critterSize = getCritterSize();
+	private static Map<Critter, Point> oldLocation = new HashMap<Critter, Point>();//x, y in arrayList (0, 1)
 
 	// Gets the package name.  This assumes that Critter and its subclasses are all in the same package.
 	static {
 		myPackage = Critter.class.getPackage().toString().split(" ")[1];
 	}
 	
+	/**
+	 * Looks in a given direction either one or 2 distances away
+	 * @param direction, the direction for the critter to check
+	 * @param steps, true is 1, false is 2
+	 * @return a string representation of what is in that spot with null meaning nothing
+	 */
 	protected final String look(int direction, boolean steps) {
 		energy = energy - Params.look_energy_cost;
 		int offset;
@@ -86,27 +88,35 @@ public abstract class Critter {
 		switch (direction) {
 		case 0:
 			newX = getNewXLocation(x_coord + (1 * offset));
+			break;
 		case 1:
 			newX = getNewXLocation(x_coord + (1 * offset));
 			newY = getNewYLocation(y_coord + (1 * offset));
+			break;
 		case 2:
 			newY = getNewYLocation(y_coord + (1 * offset));
+			break;
 		case 3:
 			newX = getNewXLocation(x_coord - (1 * offset));
 			newY = getNewYLocation(y_coord + (1 * offset));
+			break;
 		case 4:
 			newX = getNewXLocation(x_coord - (1 * offset));
+			break;
 		case 5:
 			newX = getNewXLocation(x_coord - (1 * offset));
 			newY = getNewYLocation(y_coord - (1 * offset));
+			break;
 		case 6:
 			newY = getNewYLocation(y_coord - (1 * offset));
+			break;
 		case 7:
 			newX = getNewXLocation(x_coord + (1 * offset));
 			newY = getNewYLocation(y_coord - (1 * offset));
+			break;
 		}
 		for (Critter c : population) {
-			if (oldLocation.get(c).get(0) == newX && oldLocation.get(c).get(1) == newY) {
+			if (oldLocation.get(c).x == newX && oldLocation.get(c).y == newY) {
 				return c.toString();
 			}
 		}
@@ -194,6 +204,12 @@ public abstract class Critter {
 		}
 	}
 	
+	/**
+	 * The critter reproduces and spawns an offspring next to the critter
+	 * @param offspring is the new critter to be placed world
+	 * @param direction in with respect to a circle with 0 being directly to the right and each additional is moving around the circle in a counter
+	 * clockwise fashion for a total of 8 possible directions around the critter
+	 */
 	protected final void reproduce(Critter offspring, int direction) {
 		if (energy < Params.min_reproduce_energy) {
 			return;
@@ -216,7 +232,15 @@ public abstract class Critter {
 	public abstract void doTimeStep();
 	public abstract boolean fight(String oponent);
 	
-	
+	/**
+	 * performs a world time step for the entire world consisting of the following tasks
+	 */
+	// 1. increment timestep; timestep++;
+	// 2. doTimeSteps();
+	// 3. Do the fights. doEncounters();
+	// 4. updateRestEnergy();
+	// 5. Generate Algae genAlgae();
+	// 6. Move babies to general population. population.addAll(babies); babies.clear();
 	public static void worldTimeStep() {
 		timestep++;
 		setOldLocations();
@@ -257,7 +281,10 @@ public abstract class Critter {
 		population.removeAll(populationDead);
 		oldLocation.clear();
 	}
-	
+	/**
+	 * displays the created canvas of the world on the passed pane. Will only use the shapes in the crittershape enumerator
+	 * @param the pane for the canvas of the world to be displayed on
+	 */
 	public static void displayWorld(GridPane pane) {
 		
 		Canvas canvas = new Canvas(Params.world_width * critterSize, Params.world_height * critterSize);
@@ -268,27 +295,39 @@ public abstract class Critter {
 			CritterShape d = c.viewShape();
 			switch (d) {
 				case CIRCLE:
-					DrawShapes.drawCircle(gfx, c.x_coord, c.y_coord, critterSize, c.viewFillColor());
+					DrawShapes.drawCircle(gfx, c.x_coord, c.y_coord, critterSize, c.viewFillColor(), c.viewOutlineColor());
+					break;
 				case SQUARE:
-					DrawShapes.drawSquare(gfx, c.x_coord, c.y_coord, critterSize, c.viewFillColor());
+					DrawShapes.drawSquare(gfx, c.x_coord, c.y_coord, critterSize, c.viewFillColor(), c.viewOutlineColor());
+					break;
 				case TRIANGLE:
-					DrawShapes.drawTriangle(gfx, c.x_coord, c.y_coord, critterSize, c.viewFillColor());
+					DrawShapes.drawTriangle(gfx, c.x_coord, c.y_coord, critterSize, c.viewFillColor(), c.viewOutlineColor());
+					break;
 				case DIAMOND:
-					DrawShapes.drawDiamond(gfx, c.x_coord, c.y_coord, critterSize, c.viewColor());
+					DrawShapes.drawDiamond(gfx, c.x_coord, c.y_coord, critterSize, c.viewFillColor(), c.viewOutlineColor());
+					break;
 				case STAR:
-					DrawShapes.drawStar(gfx, c.x_coord, c.y_coord, critterSize, c.viewColor());
+					DrawShapes.drawStar(gfx, c.x_coord, c.y_coord, critterSize, c.viewFillColor(), c.viewOutlineColor());
+					break;
 			}
 		}
-		pane.add(canvas, 0, 7);
+		pane.add(canvas, 3, 6);
 	} 
 	/* Alternate displayWorld, where you use Main.<pane> to reach into your
 	   display component.
 	   // public static void displayWorld() {}
 	*/
 	
-	/* create and initialize a Critter subclass
-	 * critter_class_name must be the name of a concrete subclass of Critter, if not
-	 * an InvalidCritterException must be thrown
+
+	/**
+	 * create and initialize a Critter subclass.
+	 * critter_class_name must be the unqualified name of a concrete subclass of Critter, if not,
+	 * an InvalidCritterException must be thrown.
+	 * (Java weirdness: Exception throwing does not work properly if the parameter has lower-case instead of
+	 * upper. For example, if craig is supplied instead of Craig, an error is thrown instead of
+	 * an Exception.)
+	 * @param critter_class_name
+	 * @throws InvalidCritterException
 	 */
 	public static void makeCritter(String critter_class_name) throws InvalidCritterException {
 		try {
@@ -306,6 +345,12 @@ public abstract class Critter {
 		}
 	}
 	
+	/**
+	 * Gets a list of critters of a specific type.
+	 * @param critter_class_name What kind of Critter is to be listed.  Unqualified class name.
+	 * @return List of Critters.
+	 * @throws InvalidCritterException
+	 */
 	public static List<Critter> getInstances(String critter_class_name) throws InvalidCritterException {
 		List<Critter> result = new java.util.ArrayList<Critter>();
 		try{
@@ -323,7 +368,11 @@ public abstract class Critter {
 		return result;
 	}
 
-	
+	/**
+	 * Prints out how many Critters of each type there are on the board.
+	 * @param critters List of Critters.
+	 * @return a string of the stats to be displayed
+	 */
 	public static String runStats(List<Critter> critters) {
 		String stats = new String();
 		stats = stats + "" + critters.size() + " critters as follows -- ";
@@ -543,13 +592,29 @@ public abstract class Critter {
 		}
 	}
 	
+	/**
+	 * creates a map of all the critters in their current/old locations
+	 */
 	private static void setOldLocations() {
-		ArrayList<Integer> coordinates = new ArrayList<Integer>();
 		for (Critter c : population) {				
-			coordinates.add(c.x_coord);
-			coordinates.add(c.y_coord);
-			oldLocation.put(c, coordinates);
-			coordinates.clear();
+			Point p = new Point(c.x_coord, c.y_coord);
+			oldLocation.put(c, p);
+		}
+	}
+	
+	/**
+	 * determines what the critter size scale factor should be based off of how big the params are set, ideally aiming for 600 x 600, however, it returns no smaller than 1
+	 * @return the determined crittersize factor
+	 */
+	private static int getCritterSize() {
+		if (Params.world_height >= 600 || Params.world_width >= 600) {
+			return 1;
+		}else {
+			if (Params.world_height >= Params.world_width) {
+				return 600/Params.world_height;
+			}else {
+				return 600/Params.world_width;
+			}
 		}
 	}
 }
